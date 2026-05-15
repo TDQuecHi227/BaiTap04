@@ -53,7 +53,6 @@ function LoginPage() {
           dispatch(googleLoginUser({ idToken: response.credential }))
             .unwrap()
             .then((result) => {
-              window.alert(result?.message || "Đăng nhập Google thành công.");
               navigate("/home", { replace: true });
             })
             .catch(() => {});
@@ -136,7 +135,6 @@ function LoginPage() {
     dispatch(loginUser({ identifier, password }))
       .unwrap()
       .then((response) => {
-        window.alert(response?.message || "Đăng nhập thành công.");
         navigate("/home", { replace: true });
       })
       .catch(() => {});

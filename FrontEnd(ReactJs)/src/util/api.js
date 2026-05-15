@@ -13,13 +13,36 @@ export const registerApi = (username, email, password) =>
 export const forgotPasswordApi = (email) =>
   axios.post("/api/auth/forgot-password", { email });
 
-export const resetPasswordApi = (token, newPassword) =>
-  axios.post("/api/auth/reset-password", { token, newPassword });
+export const verifyOtpApi = (email, otp) =>
+  axios.post("/api/auth/verify-otp", { email, otp });
+
+export const resetPasswordApi = (resetToken, newPassword) =>
+  axios.post("/api/auth/reset-password", { resetToken, newPassword });
+
+export const logoutAPI = () =>
+  axios.post("/api/auth/logout");
 
 // Profile APIs — matched to BE/src/routes/api.js
-export const getUserProfileApi = () => axios.get("/user/profile");
+export const getAllCoursesApi = (page = 1, limit = 9, filters = {}) => {
+  const { search = "", category = "All", priceType = "all" } = filters;
+  return axios.get(`/courses?page=${page}&limit=${limit}&search=${search}&category=${category}&priceType=${priceType}`);
+};
 
-export const getAdminProfileApi = () => axios.get("/admin/profile");
+export const getCourseDetailApi = (id) => axios.get(`/courses/${id}`);
+
+export const getUserProfileApi = () =>
+  axios.get("/user/profile");
+
+export const getAdminProfileApi = () =>
+  axios.get("/admin/profile");
 
 export const updateProfileApi = (profileData) =>
   axios.put("/user/profile", profileData);
+
+export const getHomePageApi = () =>
+  axios.get("/home");
+
+export const uploadImageApi = (formData) =>
+  axios.post("/api/v1/upload", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });

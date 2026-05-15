@@ -28,6 +28,9 @@ function ForgotPasswordPage() {
 
     dispatch(forgotPassword({ email: value }))
       .unwrap()
+      .then(() => {
+        navigate("/verify-otp", { state: { email: value } });
+      })
       .catch(() => {});
   };
 

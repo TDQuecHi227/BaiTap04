@@ -4,8 +4,11 @@ import {
   googleLoginApi,
   registerApi,
   forgotPasswordApi,
+  verifyOtpApi,
+  resetPasswordApi,
   getUserProfileApi,
   updateProfileApi,
+  logoutAPI,
 } from "../util/api";
 
 export const loginUser = createAsyncThunk(
@@ -13,14 +16,8 @@ export const loginUser = createAsyncThunk(
   async ({ identifier, password }, { rejectWithValue }) => {
     try {
       const res = await loginApi(identifier, password);
-      if (res?.redirect_url) {
-        if (res.accessToken) {
-          localStorage.setItem("access_token", res.accessToken);
-        } else {
-          localStorage.removeItem("access_token");
-        }
-        return res;
-      }
+      // Cookie jwt được server set tự động, frontend không cần xử lý token
+      if (res?.redirect_url) return res;
       return rejectWithValue(res?.message || "Đăng nhập thất bại");
     } catch (err) {
       return rejectWithValue(err?.message || "Lỗi kết nối server");
@@ -33,14 +30,7 @@ export const googleLoginUser = createAsyncThunk(
   async ({ idToken }, { rejectWithValue }) => {
     try {
       const res = await googleLoginApi(idToken);
-      if (res?.redirect_url) {
-        if (res.accessToken) {
-          localStorage.setItem("access_token", res.accessToken);
-        } else {
-          localStorage.removeItem("access_token");
-        }
-        return res;
-      }
+      if (res?.redirect_url) return res;
       return rejectWithValue(res?.message || "Đăng nhập Google thất bại");
     } catch (err) {
       return rejectWithValue(err?.message || "Lỗi kết nối server");
@@ -73,6 +63,30 @@ export const forgotPassword = createAsyncThunk(
   },
 );
 
+export const verifyOtp = createAsyncThunk(
+  "auth/verifyOtp",
+  async ({ email, otp }, { rejectWithValue }) => {
+    try {
+      const res = await verifyOtpApi(email, otp);
+      return res;
+    } catch (err) {
+      return rejectWithValue(err?.message || "Mã OTP không hợp lệ");
+    }
+  },
+);
+
+export const resetPassword = createAsyncThunk(
+  "auth/resetPassword",
+  async ({ resetToken, newPassword }, { rejectWithValue }) => {
+    try {
+      const res = await resetPasswordApi(resetToken, newPassword);
+      return res;
+    } catch (err) {
+      return rejectWithValue(err?.message || "Không thể đặt lại mật khẩu");
+    }
+  },
+);
+
 export const fetchUserProfile = createAsyncThunk(
   "auth/fetchProfile",
   async (_, { rejectWithValue }) => {
@@ -97,9 +111,26 @@ export const updateProfile = createAsyncThunk(
   },
 );
 
+export const logoutUser = createAsyncThunk(
+  "auth/logout",
+  async (_, { dispatch }) => {
+    try {
+      await logoutAPI();
+    }
+    catch (err) {
+      console.log("Lỗi khi gọi API đăng xuất", err);
+    }
+    finally {
+      dispatch(logout());
+    }
+  }
+)
 const initialState = {
   user: null,
-  isAuthenticated: !!localStorage.getItem("access_token"),
+  // Bắt đầu là false, chỉ set true sau khi gọi fetchUserProfile thành công
+  isAuthenticated: false,
+  // initializing: true khi app mới load -> chờ verify cookie xong mới redirect
+  initializing: true,
   loading: false,
   error: null,
   successMsg: null,
@@ -112,9 +143,10 @@ const authSlice = createSlice({
     logout(state) {
       state.user = null;
       state.isAuthenticated = false;
+      state.initializing = false;
       state.error = null;
       state.successMsg = null;
-      localStorage.removeItem("access_token");
+      // Không cần xóa localStorage vì token lưu trong httpOnly cookie
     },
     clearMessages(state) {
       state.error = null;
@@ -174,19 +206,44 @@ const authSlice = createSlice({
       .addCase(forgotPassword.rejected, rejected);
 
     builder
+      .addCase(verifyOtp.pending, pending)
+      .addCase(verifyOtp.fulfilled, (state) => {
+        state.loading = false;
+        state.successMsg = "Xác thực OTP thành công!";
+      })
+      .addCase(verifyOtp.rejected, rejected);
+
+    builder
+      .addCase(resetPassword.pending, pending)
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.loading = false;
+        state.successMsg = "Mật khẩu đã được cập nhật!";
+      })
+      .addCase(resetPassword.rejected, rejected);
+
+    builder
       .addCase(fetchUserProfile.pending, pending)
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
         state.loading = false;
+        state.initializing = false;
         state.user = action.payload?.data || null;
+        state.isAuthenticated = true;
       })
-      .addCase(fetchUserProfile.rejected, rejected);
+      // Token hết hạn hoặc không hợp lệ -> tự động logout
+      .addCase(fetchUserProfile.rejected, (state) => {
+        state.loading = false;
+        state.initializing = false;
+        state.user = null;
+        state.isAuthenticated = false;
+        localStorage.removeItem("access_token");
+      });
 
     builder
       .addCase(updateProfile.pending, pending)
       .addCase(updateProfile.fulfilled, (state, action) => {
         state.loading = false;
         state.successMsg = "Cập nhật hồ sơ thành công!";
-        if (action.payload?.user) state.user = action.payload.user;
+        if (action.payload?.data) state.user = action.payload.data;
       })
       .addCase(updateProfile.rejected, rejected);
   },

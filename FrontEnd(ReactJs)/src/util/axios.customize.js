@@ -5,16 +5,8 @@ const instance = axios.create({
   withCredentials: true,
 });
 
-instance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("access_token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error),
-);
+// Cookie jwt được gửi tự động nhờ withCredentials: true
+// Không cần gắn Authorization header thủ công
 
 instance.interceptors.response.use(
   (response) => {

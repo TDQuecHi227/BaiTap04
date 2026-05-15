@@ -60,7 +60,6 @@ function RegisterPage() {
     dispatch(registerUser({ username, email, password }))
       .unwrap()
       .then((response) => {
-        window.alert(response?.message || "Đăng ký thành công.");
         navigate("/login", { replace: true });
       })
       .catch(() => {});
