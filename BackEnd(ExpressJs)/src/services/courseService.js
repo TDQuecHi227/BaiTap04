@@ -55,7 +55,27 @@ const getCourseById = async (id) => {
         throw error;
     }
 }
+
+const getRelatedCourses = async (courseId, category, limit = 4) => {
+    try {
+        // Lấy các khóa học cùng category, trừ khóa hiện tại
+        const related = await Course.find({
+            _id: { $ne: courseId },
+            category: category,
+            status: "published"
+        })
+        .limit(limit)
+        .sort({ totalEnrollments: -1 }); // Ưu tiên các khóa học phổ biến
+        
+        return related;
+    } catch (error) {
+        console.log("Error in courseService.getRelatedCourses: ", error);
+        throw error;
+    }
+};
+
 module.exports = {
     getAllCourses,
-    getCourseById
+    getCourseById,
+    getRelatedCourses
 };

@@ -22,6 +22,10 @@ const courseSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    gallery: {
+      type: [String],
+      default: [], // Danh sách ảnh bổ sung cho Swiper
+    },
     introVideoUrl: {
       type: String,
       default: "", // video giới thiệu khóa

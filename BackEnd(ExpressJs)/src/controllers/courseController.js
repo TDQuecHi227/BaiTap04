@@ -32,7 +32,14 @@ const getCourseDetail = async (req, res) => {
                 message: "Course not found"
             });
         }
-        return res.status(httpStatus.OK).json(course);
+
+        // Lấy sản phẩm tương tự
+        const relatedCourses = await courseService.getRelatedCourses(course._id, course.category);
+
+        return res.status(httpStatus.OK).json({
+            course,
+            relatedCourses
+        });
     } catch (error) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
             message: "Error in fetching course detail",

@@ -16,7 +16,7 @@ const CourseCard = ({ course }) => {
           <img
             src={course.thumbnailUrl}
             alt={course.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-400 to-teal-400 text-white font-bold text-lg">
