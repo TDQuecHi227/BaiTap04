@@ -25,7 +25,7 @@ function CoursesPage() {
   const fetchCourses = useCallback(async (page, filters = {}) => {
     setIsLoading(true);
     try {
-      const res = await getAllCoursesApi(page, 8, filters);
+      const res = await getAllCoursesApi(page, 6, filters);
       if (res) {
         setCourses(res.courses || []);
         setPagination(res.pagination || { currentPage: 1, totalPages: 1, totalItems: 0 });
@@ -88,8 +88,8 @@ function CoursesPage() {
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}
                       className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-all ${selectedCategory === cat
-                          ? "bg-brand-50 text-brand-700 font-bold"
-                          : "text-gray-500 hover:bg-gray-50"
+                        ? "bg-brand-50 text-brand-700 font-bold"
+                        : "text-gray-500 hover:bg-gray-50"
                         }`}
                     >
                       {cat}
@@ -173,14 +173,22 @@ function CoursesPage() {
                 {/* Pagination */}
                 {pagination.totalPages > 1 && (
                   <div className="mt-12 flex justify-center items-center gap-2">
-                    <Button
-                      variant="secondary"
+                    <button
                       disabled={pagination.currentPage === 1}
                       onClick={() => handlePageChange(pagination.currentPage - 1)}
-                      className="px-3 py-1.5 text-xs"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-brand-50 border border-gray-100 bg-white disabled:opacity-40 disabled:hover:bg-white disabled:cursor-not-allowed transition-all"
                     >
-                      Trước
-                    </Button>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="currentColor"
+                        className="w-4 h-4"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                      </svg>
+                    </button>
 
                     <div className="flex gap-1.5">
                       {[...Array(pagination.totalPages)].map((_, index) => {
@@ -190,8 +198,8 @@ function CoursesPage() {
                             key={pageNum}
                             onClick={() => handlePageChange(pageNum)}
                             className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${pagination.currentPage === pageNum
-                                ? "bg-brand-600 text-white shadow-md shadow-brand-100"
-                                : "bg-white text-gray-500 hover:bg-brand-50 border border-gray-100"
+                              ? "bg-brand-600 text-white shadow-md shadow-brand-100"
+                              : "bg-white text-gray-500 hover:bg-brand-50 border border-gray-100"
                               }`}
                           >
                             {pageNum}
@@ -200,14 +208,22 @@ function CoursesPage() {
                       })}
                     </div>
 
-                    <Button
-                      variant="secondary"
+                    <button
                       disabled={pagination.currentPage === pagination.totalPages}
                       onClick={() => handlePageChange(pagination.currentPage + 1)}
-                      className="px-3 py-1.5 text-xs"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-brand-50 border border-gray-100 bg-white disabled:opacity-40 disabled:hover:bg-white disabled:cursor-not-allowed transition-all"
                     >
-                      Sau
-                    </Button>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="currentColor"
+                        className="w-4 h-4"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                      </svg>
+                    </button>
                   </div>
                 )}
               </>

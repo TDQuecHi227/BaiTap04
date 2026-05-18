@@ -90,6 +90,10 @@ const courseSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    views: {
+      type: Number,
+      default: 0,
+    },
     totalRevenue: {
       type: Number,
       default: 0, // tổng doanh thu thô

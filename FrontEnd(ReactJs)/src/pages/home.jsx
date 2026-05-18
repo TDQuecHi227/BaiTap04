@@ -6,13 +6,23 @@ import { getHomePageApi } from "../util/api.js";
 import { BrandLogo, Button } from "../components/ui/index.jsx";
 import CourseCard from "../components/course/CourseCard.jsx";
 
+// Import Swiper React components & modules
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination } from 'swiper/modules';
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+
 function HomePage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [homeData, setHomeData] = useState({
     promotionalCourses: [],
     newestCourses: [],
-    bestSellingCourses: []
+    bestSellingCourses: [],
+    mostViewedCourses: []
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -92,21 +102,138 @@ function HomePage() {
                 </div>
               </section>
             )}
-            {/* 3. Bán chạy */}
+            {/* 3. Bán chạy nhất */}
             {homeData.bestSellingCourses.length > 0 && (
-              <section className="pb-10">
+              <section className="pb-6">
                 <div className="flex items-center justify-between mb-8">
                   <h2 className="font-display text-3xl font-bold text-gray-900 flex items-center gap-3">
                     <span className="text-orange-500">Bán chạy nhất</span>
                   </h2>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {homeData.bestSellingCourses.map(course => (
-                    <CourseCard key={course._id} course={course} type="bestseller" />
-                  ))}
+                <div className="relative px-12 home-swiper-container">
+                  {/* Custom navigation buttons outside the Swiper element to prevent overlap */}
+                  <button className="bestseller-prev swiper-button-prev"></button>
+                  <button className="bestseller-next swiper-button-next"></button>
+
+                  <Swiper
+                    modules={[Navigation, Pagination]}
+                    spaceBetween={24}
+                    slidesPerView={1}
+                    navigation={{
+                      prevEl: '.bestseller-prev',
+                      nextEl: '.bestseller-next'
+                    }}
+                    pagination={{ clickable: true }}
+                    breakpoints={{
+                      640: { slidesPerView: 2 },
+                      768: { slidesPerView: 3 },
+                      1024: { slidesPerView: 4 }
+                    }}
+                    className="pb-12"
+                  >
+                    {homeData.bestSellingCourses.map(course => (
+                      <SwiperSlide key={course._id} className="h-auto">
+                        <CourseCard course={course} type="bestseller" />
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
                 </div>
               </section>
             )}
+
+            {/* 4. Xem nhiều nhất */}
+            {homeData.mostViewedCourses && homeData.mostViewedCourses.length > 0 && (
+              <section className="pb-10">
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="font-display text-3xl font-bold text-gray-900 flex items-center gap-3">
+                    <span className="text-teal-600">Xem nhiều nhất</span>
+                  </h2>
+                </div>
+                <div className="relative px-12 home-swiper-container">
+                  {/* Custom navigation buttons outside the Swiper element to prevent overlap */}
+                  <button className="mostviewed-prev swiper-button-prev"></button>
+                  <button className="mostviewed-next swiper-button-next"></button>
+
+                  <Swiper
+                    modules={[Navigation, Pagination]}
+                    spaceBetween={24}
+                    slidesPerView={1}
+                    navigation={{
+                      prevEl: '.mostviewed-prev',
+                      nextEl: '.mostviewed-next'
+                    }}
+                    pagination={{ clickable: true }}
+                    breakpoints={{
+                      640: { slidesPerView: 2 },
+                      768: { slidesPerView: 3 },
+                      1024: { slidesPerView: 4 }
+                    }}
+                    className="pb-12"
+                  >
+                    {homeData.mostViewedCourses.map(course => (
+                      <SwiperSlide key={course._id} className="h-auto">
+                        <CourseCard course={course} type="mostviewed" />
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                </div>
+              </section>
+            )}
+
+            {/* Premium custom styling for Home Swiper carousels */}
+            <style dangerouslySetInnerHTML={{ __html: `
+              .home-swiper-container {
+                position: relative;
+              }
+              .home-swiper-container .swiper-pagination {
+                bottom: 0px !important;
+              }
+              .home-swiper-container .swiper-pagination-bullet {
+                width: 8px;
+                height: 8px;
+                background: #cbd5e1;
+                opacity: 1;
+                transition: all 0.3s ease;
+              }
+              .home-swiper-container .swiper-pagination-bullet-active {
+                background: #16a34a !important;
+                width: 24px;
+                border-radius: 4px;
+              }
+              .home-swiper-container .swiper-button-next {
+                right: 0px !important;
+              }
+              .home-swiper-container .swiper-button-prev {
+                left: 0px !important;
+              }
+              .home-swiper-container .swiper-button-next,
+              .home-swiper-container .swiper-button-prev {
+                color: #16a34a !important;
+                background: transparent !important;
+                width: 40px !important;
+                height: 40px !important;
+                border-radius: 50% !important;
+                box-shadow: none !important;
+                border: none !important;
+                transition: all 0.2s ease;
+              }
+              .home-swiper-container .swiper-button-next:hover,
+              .home-swiper-container .swiper-button-prev:hover {
+                transform: scale(1.2);
+                box-shadow: none !important;
+                background: transparent !important;
+              }
+              .home-swiper-container .swiper-button-next:after,
+              .home-swiper-container .swiper-button-prev:after {
+                font-size: 14px !important;
+                font-weight: 800 !important;
+              }
+              .home-swiper-container .swiper-button-disabled {
+                opacity: 0 !important;
+                cursor: not-allowed;
+                pointer-events: none;
+              }
+            ` }} />
           </>
         )}
       </main>

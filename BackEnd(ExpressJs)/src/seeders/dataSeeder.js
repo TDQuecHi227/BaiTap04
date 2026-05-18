@@ -73,7 +73,7 @@ const seedAll = async () => {
     const students = users.filter(u => u.role === "user");
     console.log(`✅ Seeded ${users.length} Users (1 admin, 2 teachers, 3 students)`);
 
-    // ═══════════════ 2. COURSES (6 khóa: 2 promo, 2 bestseller, 2 newest) ═══════════════
+    // ═══════════════ 2. COURSES (10 khóa) ═══════════════
     const now = new Date();
     const courses = await Course.insertMany([
       // --- Nhóm KHUYẾN MÃI (có discountPrice, enroll thấp, ngày cũ) ---
@@ -85,6 +85,8 @@ const seedAll = async () => {
         totalEnrollments: 25, averageRating: 4.8, totalRatings: 12,
         publishedAt: new Date(now.getTime() - 30 * 86400000),
         createdAt: new Date(now.getTime() - 30 * 86400000),
+        gallery: [],
+        views: 3200,
       },
       {
         teacherId: teachers[1]._id, title: "TOEIC Listening – Từ 400 lên 700+",
@@ -94,6 +96,8 @@ const seedAll = async () => {
         totalEnrollments: 40, averageRating: 4.6, totalRatings: 18,
         publishedAt: new Date(now.getTime() - 25 * 86400000),
         createdAt: new Date(now.getTime() - 25 * 86400000),
+        gallery: [],
+        views: 1850,
       },
       // --- Nhóm BÁN CHẠY (không discount, enroll cao, ngày trung bình) ---
       {
@@ -104,6 +108,8 @@ const seedAll = async () => {
         totalEnrollments: 1200, averageRating: 4.9, totalRatings: 350,
         publishedAt: new Date(now.getTime() - 15 * 86400000),
         createdAt: new Date(now.getTime() - 15 * 86400000),
+        gallery: [],
+        views: 9800,
       },
       {
         teacherId: teachers[1]._id, title: "Ngữ Pháp Tiếng Anh Trọn Đời",
@@ -113,6 +119,8 @@ const seedAll = async () => {
         totalEnrollments: 980, averageRating: 4.7, totalRatings: 280,
         publishedAt: new Date(now.getTime() - 10 * 86400000),
         createdAt: new Date(now.getTime() - 10 * 86400000),
+        gallery: [],
+        views: 6500,
       },
       // --- Nhóm MỚI NHẤT (không discount, enroll thấp, ngày mới) ---
       {
@@ -123,6 +131,8 @@ const seedAll = async () => {
         totalEnrollments: 8, averageRating: 5.0, totalRatings: 3,
         publishedAt: new Date(now.getTime() - 2 * 3600000),
         createdAt: new Date(now.getTime() - 2 * 3600000),
+        gallery: [],
+        views: 1200,
       },
       {
         teacherId: teachers[1]._id, title: "Tiếng Anh Chuyên Ngành CNTT",
@@ -131,9 +141,112 @@ const seedAll = async () => {
         price: 900000, discountPrice: null, status: "published",
         totalEnrollments: 3, averageRating: 0, totalRatings: 0,
         publishedAt: now, createdAt: now,
+        gallery: [],
+        views: 450,
+      },
+      // --- 4 Khóa học thêm mới ---
+      {
+        teacherId: teachers[0]._id, title: "Luyện Viết IELTS Writing Task 1 & 2",
+        description: "Bí quyết đạt Band 7.5+ Writing với các bài mẫu phân tích chi tiết.",
+        category: "IELTS", level: "intermediate", tags: ["ielts", "writing"],
+        price: 1500000, discountPrice: 799000, status: "published",
+        totalEnrollments: 45, averageRating: 4.9, totalRatings: 22,
+        publishedAt: new Date(now.getTime() - 5 * 86400000),
+        createdAt: new Date(now.getTime() - 5 * 86400000),
+        gallery: [],
+        views: 2300,
+      },
+      {
+        teacherId: teachers[1]._id, title: "Tiếng Anh Giao Tiếp Hàng Ngày",
+        description: "Học giao tiếp tự nhiên qua các chủ đề thực tế đời sống dành cho người mới bắt đầu.",
+        category: "Communication", level: "beginner", tags: ["communication", "speaking"],
+        price: 500000, discountPrice: null, status: "published",
+        totalEnrollments: 350, averageRating: 4.8, totalRatings: 90,
+        publishedAt: new Date(now.getTime() - 8 * 86400000),
+        createdAt: new Date(now.getTime() - 8 * 86400000),
+        gallery: [],
+        views: 4200,
+      },
+      {
+        teacherId: teachers[0]._id, title: "Luyện Thi THPT Quốc Gia Tiếng Anh",
+        description: "Hệ thống toàn bộ kiến thức ngữ pháp trọng tâm và chiến thuật giải đề đạt điểm cao.",
+        category: "Ngữ pháp", level: "intermediate", tags: ["thpt", "grammar"],
+        price: 600000, discountPrice: 299000, status: "published",
+        totalEnrollments: 620, averageRating: 4.7, totalRatings: 145,
+        publishedAt: new Date(now.getTime() - 12 * 86400000),
+        createdAt: new Date(now.getTime() - 12 * 86400000),
+        gallery: [],
+        views: 3100,
+      },
+      {
+        teacherId: teachers[1]._id, title: "Tiếng Anh Thương Mại - Business English",
+        description: "Kỹ năng thuyết trình, viết email công việc và đàm phán bằng tiếng Anh chuyên nghiệp.",
+        category: "Chuyên ngành", level: "advanced", tags: ["business", "professional"],
+        price: 1100000, discountPrice: null, status: "published",
+        totalEnrollments: 120, averageRating: 4.6, totalRatings: 35,
+        publishedAt: new Date(now.getTime() - 18 * 86400000),
+        createdAt: new Date(now.getTime() - 18 * 86400000),
+        gallery: [],
+        views: 1500,
+      },
+      // --- 5 Khóa học thêm mới thứ hai ---
+      {
+        teacherId: teachers[0]._id, title: "IELTS Reading – Chiến thuật làm bài trọn điểm",
+        description: "Các kỹ năng Skimming, Scanning và giải mã mọi dạng câu hỏi IELTS Reading.",
+        category: "IELTS", level: "intermediate", tags: ["ielts", "reading"],
+        price: 1100000, discountPrice: 499000, status: "published",
+        totalEnrollments: 80, averageRating: 4.8, totalRatings: 32,
+        publishedAt: new Date(now.getTime() - 4 * 86400000),
+        createdAt: new Date(now.getTime() - 4 * 86400000),
+        gallery: [],
+        views: 2900,
+      },
+      {
+        teacherId: teachers[1]._id, title: "TOEIC Speaking & Writing – Từ 0 đến Master",
+        description: "Đầy đủ kiến thức và bài tập thực hành theo định dạng đề thi mới nhất.",
+        category: "TOEIC", level: "intermediate", tags: ["toeic", "speaking", "writing"],
+        price: 1300000, discountPrice: 699000, status: "published",
+        totalEnrollments: 55, averageRating: 4.7, totalRatings: 20,
+        publishedAt: new Date(now.getTime() - 6 * 86400000),
+        createdAt: new Date(now.getTime() - 6 * 86400000),
+        gallery: [],
+        views: 1750,
+      },
+      {
+        teacherId: teachers[0]._id, title: "Từ vựng tiếng Anh chuyên ngành Kinh tế & Marketing",
+        description: "Học từ vựng qua các case study thực tế và mẫu đàm phán thương mại.",
+        category: "Chuyên ngành", level: "intermediate", tags: ["business", "marketing"],
+        price: 750000, discountPrice: null, status: "published",
+        totalEnrollments: 140, averageRating: 4.9, totalRatings: 45,
+        publishedAt: new Date(now.getTime() - 10 * 86400000),
+        createdAt: new Date(now.getTime() - 10 * 86400000),
+        gallery: [],
+        views: 3800,
+      },
+      {
+        teacherId: teachers[1]._id, title: "Ngữ Pháp Tiếng Anh Nâng Cao",
+        description: "Làm chủ cấu trúc câu phức tạp, viết câu chuẩn và nói tiếng Anh tự nhiên.",
+        category: "Ngữ pháp", level: "advanced", tags: ["advanced-grammar", "writing"],
+        price: 850000, discountPrice: 399000, status: "published",
+        totalEnrollments: 210, averageRating: 4.8, totalRatings: 75,
+        publishedAt: new Date(now.getTime() - 15 * 86400000),
+        createdAt: new Date(now.getTime() - 15 * 86400000),
+        gallery: [],
+        views: 4700,
+      },
+      {
+        teacherId: teachers[0]._id, title: "Tiếng Anh Giao Tiếp Văn Phòng",
+        description: "Giao tiếp tự tin khi đi phỏng vấn, họp hành, viết báo cáo và gửi email cho sếp.",
+        category: "Communication", level: "intermediate", tags: ["communication", "career"],
+        price: 950000, discountPrice: null, status: "published",
+        totalEnrollments: 320, averageRating: 4.9, totalRatings: 110,
+        publishedAt: new Date(now.getTime() - 20 * 86400000),
+        createdAt: new Date(now.getTime() - 20 * 86400000),
+        gallery: [],
+        views: 5200,
       },
     ]);
-    console.log(`✅ Seeded ${courses.length} Courses (2 promo, 2 bestseller, 2 newest)`);
+    console.log(`✅ Seeded ${courses.length} Courses (with empty gallery arrays)`);
 
     // ═══════════════ 3. FLASHCARD SETS ═══════════════
     const sets = await FlashcardSet.insertMany([

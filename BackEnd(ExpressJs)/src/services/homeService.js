@@ -11,24 +11,33 @@ const getHomePageData = async () => {
         .limit(4);
 
     const newestCoursesPromise = Course.find(baseQuery)
+        .populate("teacherId", "username avatar")
         .sort({ createdAt: -1 })
         .limit(4);
 
     const bestSellingCoursesPromise = Course.find(baseQuery)
+        .populate("teacherId", "username avatar")
         .sort({ totalEnrollments: -1 })
-        .limit(4);
+        .limit(10);
 
-    const [promotionalCourses, newestCourses, bestSellingCourses] =
+    const mostViewedCoursesPromise = Course.find(baseQuery)
+        .populate("teacherId", "username avatar")
+        .sort({ views: -1 })
+        .limit(10);
+
+    const [promotionalCourses, newestCourses, bestSellingCourses, mostViewedCourses] =
         await Promise.all([
             promotionalCoursesPromise,
             newestCoursesPromise,
             bestSellingCoursesPromise,
+            mostViewedCoursesPromise,
         ]);
 
     return {
         promotionalCourses,
         newestCourses,
         bestSellingCourses,
+        mostViewedCourses,
     };
 };
 
