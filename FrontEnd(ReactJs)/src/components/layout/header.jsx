@@ -9,6 +9,7 @@ export function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSelector((state) => state.auth);
+  const { items } = useSelector((state) => state.cart);
   const [profileOpen, setProfileOpen] = useState(false);
 
   useEffect(() => {
@@ -71,18 +72,25 @@ export function Header() {
           >
             Khóa học
           </button>
-          <button
-            onClick={() => navigate("/profile")}
-            className={`px-4 py-1.5 text-sm font-medium rounded-full transition-all ${isActive("/profile")
-              ? "bg-brand-50 text-brand-700 shadow-sm"
-              : "text-gray-500 hover:text-gray-900"
-              }`}
-          >
-            Hồ sơ
-          </button>
+
         </div>
 
-        <div className="relative" data-avatar-menu>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate("/cart")}
+            className="relative p-2 rounded-full hover:bg-gray-100 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            {items.length > 0 && (
+              <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-500 rounded-full">
+                {items.length}
+              </span>
+            )}
+          </button>
+
+          <div className="relative" data-avatar-menu>
           <button
             onClick={() => setProfileOpen(!profileOpen)}
             className="flex items-center gap-3 rounded-full bg-white/80 border border-brand-100 shadow-sm px-2.5 py-1.5 hover:shadow-md transition-all active:scale-95"
@@ -134,6 +142,13 @@ export function Header() {
                   </Button>
                   <Button
                     variant="secondary"
+                    className="w-full justify-center"
+                    onClick={() => navigate("/orders")}
+                  >
+                    Đơn hàng của tôi
+                  </Button>
+                  <Button
+                    variant="secondary"
                     className="w-full justify-center text-red-600 border-red-100 hover:bg-red-50"
                     onClick={handleLogout}
                   >
@@ -143,6 +158,7 @@ export function Header() {
               </div>
             </div>
           )}
+        </div>
         </div>
       </div>
     </header>

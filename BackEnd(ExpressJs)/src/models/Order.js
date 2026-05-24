@@ -43,16 +43,30 @@ const orderSchema = new mongoose.Schema(
     },
 
     /*
-     * Trạng thái đơn:
-     * "pending"   : chờ thanh toán
-     * "paid"      : đã thanh toán thành công
-     * "failed"    : thanh toán thất bại
-     * "refunded"  : đã hoàn tiền
+     * Trạng thái đơn hàng:
+     * "new"               : 1. Đơn hàng mới
+     * "confirmed"         : 2. Đã xác nhận đơn hàng
+     * "preparing"         : 3. Shop đang chuẩn bị hàng
+     * "delivering"        : 4. Đang giao hàng
+     * "delivered"         : 5. Đã giao thành công
+     * "cancelled"         : 6. Hủy đơn hàng
+     * "cancel_requested"  : Yêu cầu hủy đơn (khi đang ở bước preparing)
      */
     status: {
       type: String,
-      enum: ["pending", "paid", "failed", "refunded"],
-      default: "pending",
+      enum: ["new", "confirmed", "preparing", "delivering", "delivered", "cancelled", "cancel_requested", "pending", "paid", "failed", "refunded"],
+      default: "new",
+    },
+    
+    statusTimeline: {
+      type: [
+        {
+          status: String,
+          timestamp: { type: Date, default: Date.now },
+          note: String
+        }
+      ],
+      default: [],
     },
 
     // Thông tin cổng thanh toán

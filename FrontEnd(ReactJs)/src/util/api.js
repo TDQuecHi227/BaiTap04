@@ -46,3 +46,16 @@ export const uploadImageApi = (formData) =>
   axios.post("/api/v1/upload", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
+
+// Cart APIs
+export const getCartApi = () => axios.get("/cart");
+export const addToCartApi = (courseId) => axios.post("/cart", { courseId });
+export const removeFromCartApi = (courseId) => axios.delete(`/cart/${courseId}`);
+
+// Checkout API
+export const checkoutApi = (paymentMethod) => axios.post("/checkout", { paymentMethod });
+
+// Orders APIs
+export const getMyOrdersApi = () => axios.get("/orders");
+export const cancelOrderApi = (orderId) => axios.post(`/orders/${orderId}/cancel`);
+

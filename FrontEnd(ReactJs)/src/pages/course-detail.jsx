@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../store/cartSlice";
 import { getCourseDetailApi } from "../util/api";
 import { Header } from "../components/layout/header.jsx";
 import { Button, Spinner } from "../components/ui/index.jsx";
+import { useToast } from "../components/context/ToastContext.jsx";
 import CourseGallery from "../components/course/CourseGallery.jsx";
 import CourseCard from "../components/course/CourseCard.jsx";
 
@@ -12,6 +15,25 @@ function CourseDetailPage() {
   const [course, setCourse] = useState(null);
   const [relatedCourses, setRelatedCourses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  const dispatch = useDispatch();
+  const { addToast } = useToast();
+  const { items, loading: cartLoading } = useSelector((state) => state.cart);
+
+  const isCourseInCart = items.some((item) => item.courseId?._id === id || item.courseId === id);
+
+  const handleAddToCart = async () => {
+    if (isCourseInCart) {
+      navigate("/cart");
+      return;
+    }
+    const resultAction = await dispatch(addToCart(id));
+    if (addToCart.fulfilled.match(resultAction)) {
+      addToast("Đã thêm khóa học vào giỏ hàng thành công!", "success");
+    } else {
+      addToast(resultAction.payload || "Không thể thêm vào giỏ hàng", "error");
+    }
+  };
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -154,8 +176,13 @@ function CourseDetailPage() {
                 <Button variant="primary" className="w-full py-4 text-lg font-bold shadow-lg shadow-brand-100">
                   Đăng ký ngay
                 </Button>
-                <Button variant="secondary" className="w-full py-4 font-bold">
-                  Thêm vào yêu thích
+                <Button 
+                  variant="secondary" 
+                  className="w-full py-4 font-bold"
+                  onClick={handleAddToCart}
+                  disabled={cartLoading}
+                >
+                  {cartLoading ? "Đang xử lý..." : isCourseInCart ? "Xem giỏ hàng" : "Thêm vào giỏ hàng"}
                 </Button>
               </div>
 

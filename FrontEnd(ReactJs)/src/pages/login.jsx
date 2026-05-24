@@ -14,10 +14,12 @@ import {
   AuthCard,
   Divider,
 } from "../components/ui/index.jsx";
+import { useToast } from "../components/context/ToastContext.jsx";
 
 function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const { loading, error, successMsg } = useSelector((state) => state.auth);
   const googleButtonRef = useRef(null);
   const [form, setForm] = useState({
@@ -53,6 +55,7 @@ function LoginPage() {
           dispatch(googleLoginUser({ idToken: response.credential }))
             .unwrap()
             .then((result) => {
+              addToast("Đăng nhập Google thành công!", "success");
               navigate("/home", { replace: true });
             })
             .catch(() => {});
@@ -135,6 +138,7 @@ function LoginPage() {
     dispatch(loginUser({ identifier, password }))
       .unwrap()
       .then((response) => {
+        addToast("Đăng nhập thành công!", "success");
         navigate("/home", { replace: true });
       })
       .catch(() => {});

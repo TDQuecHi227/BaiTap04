@@ -1,8 +1,10 @@
 import { useEffect } from "react";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { ToastProvider } from "./components/context/ToastContext.jsx";
 import store from "./store/index.js";
 import { fetchUserProfile } from "./store/authSlice.js";
+import { fetchCart } from "./store/cartSlice.js";
 import HomePage from "./pages/home.jsx";
 import LoginPage from "./pages/login.jsx";
 import RegisterPage from "./pages/register.jsx";
@@ -12,6 +14,8 @@ import ResetPasswordPage from "./pages/reset-password.jsx";
 import ProfilePage from "./pages/user.jsx";
 import CoursesPage from "./pages/courses.jsx";
 import CourseDetailPage from "./pages/course-detail.jsx";
+import CartPage from "./pages/cart.jsx";
+import OrdersPage from "./pages/orders.jsx";
 
 function AppContent() {
   const dispatch = useDispatch();
@@ -19,6 +23,9 @@ function AppContent() {
 
   useEffect(() => {
     dispatch(fetchUserProfile());
+    if (isAuthenticated) {
+      dispatch(fetchCart());
+    }
   }, [dispatch, isAuthenticated]);
 
   return (
@@ -97,6 +104,22 @@ function AppContent() {
             </RequireAuth>
           }
         />
+        <Route
+          path="/cart"
+          element={
+            <RequireAuth>
+              <CartPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/orders"
+          element={
+            <RequireAuth>
+              <OrdersPage />
+            </RequireAuth>
+          }
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
@@ -106,7 +129,9 @@ function AppContent() {
 function App() {
   return (
     <Provider store={store}>
-      <AppContent />
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
     </Provider>
   );
 }

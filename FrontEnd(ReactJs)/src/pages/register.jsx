@@ -9,10 +9,12 @@ import {
   Alert,
   AuthCard,
 } from "../components/ui/index.jsx";
+import { useToast } from "../components/context/ToastContext.jsx";
 
 function RegisterPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const { loading, error, successMsg } = useSelector((state) => state.auth);
   const [form, setForm] = useState({
     username: "",
@@ -60,6 +62,7 @@ function RegisterPage() {
     dispatch(registerUser({ username, email, password }))
       .unwrap()
       .then((response) => {
+        addToast("Đăng ký tài khoản thành công!", "success");
         navigate("/login", { replace: true });
       })
       .catch(() => {});
