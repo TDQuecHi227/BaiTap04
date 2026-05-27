@@ -4,6 +4,7 @@ import {
   googleLoginApi,
   registerApi,
   forgotPasswordApi,
+  resendOtpApi,
   verifyOtpApi,
   resetPasswordApi,
   getUserProfileApi,
@@ -20,7 +21,7 @@ export const loginUser = createAsyncThunk(
       if (res?.redirect_url) return res;
       return rejectWithValue(res?.message || "Đăng nhập thất bại");
     } catch (err) {
-      return rejectWithValue(err?.message || "Lỗi kết nối server");
+      return rejectWithValue(err || { message: "Lỗi kết nối server" });
     }
   },
 );
@@ -71,6 +72,18 @@ export const verifyOtp = createAsyncThunk(
       return res;
     } catch (err) {
       return rejectWithValue(err?.message || "Mã OTP không hợp lệ");
+    }
+  },
+);
+
+export const resendOtp = createAsyncThunk(
+  "auth/resendOtp",
+  async ({ email, type }, { rejectWithValue }) => {
+    try {
+      const res = await resendOtpApi(email, type);
+      return res;
+    } catch (err) {
+      return rejectWithValue(err?.message || "Không thể gửi lại mã OTP");
     }
   },
 );
@@ -134,6 +147,7 @@ const initialState = {
   loading: false,
   error: null,
   successMsg: null,
+  unverifiedEmail: null,
 };
 
 const authSlice = createSlice({
@@ -146,11 +160,13 @@ const authSlice = createSlice({
       state.initializing = false;
       state.error = null;
       state.successMsg = null;
+      state.unverifiedEmail = null;
       // Không cần xóa localStorage vì token lưu trong httpOnly cookie
     },
     clearMessages(state) {
       state.error = null;
       state.successMsg = null;
+      state.unverifiedEmail = null;
     },
     setUser(state, action) {
       state.user = action.payload;
@@ -173,9 +189,19 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.isAuthenticated = true;
+        state.unverifiedEmail = null;
         state.successMsg = action.payload?.message || "Đăng nhập thành công!";
       })
-      .addCase(loginUser.rejected, rejected);
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        if (action.payload && typeof action.payload === "object") {
+          state.error = action.payload.message || "Đăng nhập thất bại";
+          state.unverifiedEmail = action.payload.email || null;
+        } else {
+          state.error = action.payload || "Đăng nhập thất bại";
+          state.unverifiedEmail = null;
+        }
+      });
 
     builder
       .addCase(googleLoginUser.pending, pending)
@@ -212,6 +238,14 @@ const authSlice = createSlice({
         state.successMsg = "Xác thực OTP thành công!";
       })
       .addCase(verifyOtp.rejected, rejected);
+
+    builder
+      .addCase(resendOtp.pending, pending)
+      .addCase(resendOtp.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMsg = action.payload?.message || "Đã gửi lại mã OTP!";
+      })
+      .addCase(resendOtp.rejected, rejected);
 
     builder
       .addCase(resetPassword.pending, pending)

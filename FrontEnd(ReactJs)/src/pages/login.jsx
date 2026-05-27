@@ -20,7 +20,7 @@ function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { addToast } = useToast();
-  const { loading, error, successMsg } = useSelector((state) => state.auth);
+  const { loading, error, successMsg, unverifiedEmail } = useSelector((state) => state.auth);
   const googleButtonRef = useRef(null);
   const [form, setForm] = useState({
     identifier: "",
@@ -160,7 +160,25 @@ function LoginPage() {
           <div className="mb-4">
             <Alert
               type="error"
-              message={error}
+              message={
+                <span className="flex flex-col gap-1">
+                  <span>{error}</span>
+                  {unverifiedEmail && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        dispatch(clearMessages());
+                        navigate("/verify-otp", {
+                          state: { email: unverifiedEmail, fromRegister: true },
+                        });
+                      }}
+                      className="text-left text-sm font-semibold text-brand-600 hover:text-brand-700 underline mt-1"
+                    >
+                      Xác thực tài khoản ngay bây giờ →
+                    </button>
+                  )}
+                </span>
+              }
               onClose={() => dispatch(clearMessages())}
             />
           </div>

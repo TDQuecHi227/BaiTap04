@@ -17,7 +17,9 @@ const loginUser = async (identifier, password) => {
   }
 
   if (!user.isVerified) {
-    throw new Error("ACCOUNT_NOT_VERIFIED");
+    const err = new Error("ACCOUNT_NOT_VERIFIED");
+    err.email = user.email;
+    throw err;
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
@@ -84,6 +86,29 @@ const forgotPassword = async (email) => {
   await user.save();
 
   await emailService.sendOtpEmail(email, code, "reset");
+};
+
+const resendOtp = async (email, type = "register") => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error("USER_NOT_FOUND");
+  }
+
+  if (type === "register" && user.isVerified) {
+    throw new Error("ALREADY_VERIFIED");
+  }
+
+  const { code, expiresAt } = otpService.createOtp();
+  const hashedOtp = await bcrypt.hash(code, 10);
+
+  user.otp = {
+    code: hashedOtp,
+    expiresAt,
+  };
+  await user.save();
+
+  await emailService.sendOtpEmail(email, code, type);
+  return { message: "Mã OTP mới đã được gửi thành công!" };
 };
 
 const verifyOtp = async (email, otpCode) => {
@@ -198,6 +223,7 @@ module.exports = {
   loginUser,
   registerUser,
   forgotPassword,
+  resendOtp,
   verifyOtp,
   resetPassword,
   loginWithGoogle,

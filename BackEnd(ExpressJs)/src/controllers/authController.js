@@ -33,6 +33,7 @@ const login = async (req, res) => {
         .status(httpStatus.FORBIDDEN)
         .json({
           message: "Tài khoản chưa được kích hoạt. Vui lòng xác thực OTP.",
+          email: error.email,
         });
     }
 
@@ -109,6 +110,26 @@ const forgotPassword = async (req, res) => {
   }
 };
 
+const resendOtp = async (req, res) => {
+  try {
+    const { email, type } = req.body;
+    const result = await authService.resendOtp(email, type || "register");
+    return res.status(httpStatus.OK).json(result);
+  } catch (error) {
+    const errorMessages = {
+      USER_NOT_FOUND: "Không tìm thấy người dùng.",
+      ALREADY_VERIFIED: "Tài khoản đã được xác thực trước đó.",
+    };
+
+    if (errorMessages[error.message]) {
+      return res.status(httpStatus.BAD_REQUEST).json({ message: errorMessages[error.message] });
+    }
+
+    console.error(error);
+    return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: "Lỗi server nội bộ." });
+  }
+};
+
 const verifyOtp = async (req, res) => {
   try {
     const { email, otp, otpCode } = req.body;
@@ -177,6 +198,7 @@ module.exports = {
   login,
   googleLogin,
   forgotPassword,
+  resendOtp,
   verifyOtp,
   resetPassword,
   register,

@@ -62,8 +62,8 @@ function RegisterPage() {
     dispatch(registerUser({ username, email, password }))
       .unwrap()
       .then((response) => {
-        addToast("Đăng ký tài khoản thành công!", "success");
-        navigate("/login", { replace: true });
+        addToast("Đăng ký thành công! Vui lòng nhập mã OTP để kích hoạt tài khoản.", "success");
+        navigate("/verify-otp", { state: { email, fromRegister: true } });
       })
       .catch(() => {});
   };

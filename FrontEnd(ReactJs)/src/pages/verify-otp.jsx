@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
-import { verifyOtp, clearMessages } from "../store/authSlice.js";
+import { verifyOtp, resendOtp, clearMessages } from "../store/authSlice.js";
 import { AuthLayout } from "../components/layout/AuthLayout.jsx";
 import {
   InputField,
@@ -9,23 +9,34 @@ import {
   Alert,
   AuthCard,
 } from "../components/ui/index.jsx";
+import { useToast } from "../components/context/ToastContext.jsx";
 
 function VerifyOtpPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { addToast } = useToast();
   const { loading, error, successMsg } = useSelector((state) => state.auth);
   const [otp, setOtp] = useState("");
   const [fieldError, setFieldError] = useState("");
+  const [countdown, setCountdown] = useState(0);
 
   const email = location.state?.email;
+  const fromRegister = location.state?.fromRegister;
 
   useEffect(() => {
     if (!email) {
-      navigate("/forgot-password");
+      navigate(fromRegister ? "/register" : "/forgot-password");
     }
     return () => dispatch(clearMessages());
-  }, [dispatch, email, navigate]);
+  }, [dispatch, email, navigate, fromRegister]);
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -46,13 +57,25 @@ function VerifyOtpPage() {
       .then((response) => {
         // Nếu thành công và có resetToken, chuyển sang trang đặt lại mật khẩu
         if (response.resetToken) {
+          addToast("Xác thực OTP thành công. Vui lòng đặt mật khẩu mới.", "success");
           navigate("/reset-password", { 
             state: { resetToken: response.resetToken } 
           });
         } else {
           // Trường hợp verify tài khoản (đăng ký)
+          addToast("Xác thực tài khoản thành công! Bạn có thể đăng nhập ngay.", "success");
           navigate("/login");
         }
+      })
+      .catch(() => {});
+  };
+
+  const handleResend = () => {
+    dispatch(resendOtp({ email, type: fromRegister ? "register" : "reset" }))
+      .unwrap()
+      .then((res) => {
+        addToast(res?.message || "Đã gửi lại mã OTP thành công!", "success");
+        setCountdown(60);
       })
       .catch(() => {});
   };
@@ -61,7 +84,7 @@ function VerifyOtpPage() {
     <AuthLayout>
       <AuthCard>
         <button
-          onClick={() => navigate("/forgot-password")}
+          onClick={() => navigate(fromRegister ? "/register" : "/forgot-password")}
           className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-600 mb-5 transition-colors"
           type="button"
         >
@@ -149,13 +172,17 @@ function VerifyOtpPage() {
 
         <p className="mt-6 text-center text-sm text-gray-500">
           Không nhận được mã?{" "}
-          <button
-            onClick={() => navigate("/forgot-password")}
-            className="text-brand-600 font-semibold hover:text-brand-700"
-            type="button"
-          >
-            Gửi lại mã
-          </button>
+          {countdown > 0 ? (
+            <span className="text-gray-400 font-medium">Gửi lại sau {countdown}s</span>
+          ) : (
+            <button
+              onClick={handleResend}
+              className="text-brand-600 font-semibold hover:text-brand-700"
+              type="button"
+            >
+              Gửi lại mã
+            </button>
+          )}
         </p>
       </AuthCard>
     </AuthLayout>

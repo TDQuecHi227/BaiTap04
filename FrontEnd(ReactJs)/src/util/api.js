@@ -13,6 +13,9 @@ export const registerApi = (username, email, password) =>
 export const forgotPasswordApi = (email) =>
   axios.post("/api/auth/forgot-password", { email });
 
+export const resendOtpApi = (email, type = "register") =>
+  axios.post("/api/auth/resend-otp", { email, type });
+
 export const verifyOtpApi = (email, otp) =>
   axios.post("/api/auth/verify-otp", { email, otp });
 

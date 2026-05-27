@@ -34,6 +34,14 @@ const initAuthRoute = (app) => {
     authController.forgotPassword,
   );
 
+  // POST /api/auth/resend-otp
+  router.post(
+    "/resend-otp",
+    otpLimiter,
+    validateForgotPassword, // Re-uses the validation that checks if the body has a valid email address
+    authController.resendOtp,
+  );
+
   // POST /api/auth/verify-otp
   router.post(
     "/verify-otp",
