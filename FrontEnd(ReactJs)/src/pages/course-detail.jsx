@@ -35,6 +35,19 @@ function CourseDetailPage() {
     }
   };
 
+  const handleRegisterNow = async () => {
+    if (isCourseInCart) {
+      navigate("/cart");
+      return;
+    }
+    const resultAction = await dispatch(addToCart(id));
+    if (addToCart.fulfilled.match(resultAction)) {
+      navigate("/cart");
+    } else {
+      addToast(resultAction.payload || "Không thể đăng ký khóa học", "error");
+    }
+  };
+
   useEffect(() => {
     const fetchDetail = async () => {
       setIsLoading(true);
@@ -173,8 +186,13 @@ function CourseDetailPage() {
               </div>
 
               <div className="space-y-3">
-                <Button variant="primary" className="w-full py-4 text-lg font-bold shadow-lg shadow-brand-100">
-                  Đăng ký ngay
+                <Button 
+                  variant="primary" 
+                  className="w-full py-4 text-lg font-bold shadow-lg shadow-brand-100"
+                  onClick={handleRegisterNow}
+                  disabled={cartLoading}
+                >
+                  {cartLoading ? "Đang xử lý..." : "Đăng ký ngay"}
                 </Button>
                 <Button 
                   variant="secondary" 
